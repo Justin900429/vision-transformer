@@ -31,11 +31,11 @@ class Attention(nn.Module):
         # Shape of k: (batch_size, num_heads, k_seq_length, dim_head)
         # Shape of v: (batch_size, num_heads, v_seq_length, dim_head)
         # NOTE: k_seq_length == v_seq_length
-        q = einops.rearrange(self.q_w(x), "b s e -> b n s d",
+        q = einops.rearrange(self.q_w(x), "b s (n d) -> b n s d",
                              n=self.num_heads)
-        k = einops.rearrange(self.k_w(x), "b s e -> b n s d",
+        k = einops.rearrange(self.k_w(x), "b s (n d) -> b n s d",
                              n=self.num_heads)
-        v = einops.rearrange(self.k_w(x), "b s e -> b n s d",
+        v = einops.rearrange(self.k_w(x), "b s (n d) -> b n s d",
                              n=self.num_heads)
 
         # Compute the attention energy
@@ -47,7 +47,7 @@ class Attention(nn.Module):
         # Compute the final weight on value
         # Shape of x: (batch_size, q_seq_length, emb_size)
         x = torch.einsum("bnqk,bnkd->bnqd", attn, v)
-        x = einops.rearrange(x, "b n q d -> b q (nd)")
+        x = einops.rearrange(x, "b n q d -> b q (n d)")
         x = self.proj(x)
 
         return x

@@ -7,7 +7,7 @@ from layers.patch_embed import PatchEmbed
 from layers.transformer_encoder import TransformerEncoder
 
 
-class ViT(nn.Module):
+class DeiT(nn.Module):
     def __init__(self,
                  img_size: int = 224,
                  patch_size: int = 16,
@@ -23,7 +23,7 @@ class ViT(nn.Module):
                  embed_layer: nn.Module = PatchEmbed,
                  norm_layer: nn.Module = nn.LayerNorm,
                  act_layer: Optional = nn.GELU):
-        super(ViT, self).__init__()
+        super(DeiT, self).__init__()
 
         self.num_classes = num_classes
         self.embed_dim = embed_dim
@@ -36,7 +36,8 @@ class ViT(nn.Module):
         num_patches = self.patch_embed.num_patches
 
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
-        self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, embed_dim))
+        self.dist_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
+        self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 2, embed_dim))
         self.pos_drop = nn.Dropout(drop_rate)
 
         self.blocks = nn.Sequential(*[
@@ -53,30 +54,35 @@ class ViT(nn.Module):
 
         # Classifier heads
         self.head = nn.Linear(self.embed_dim, num_classes)
+        self.head_list = nn.Linear(self.embed_dim, self.num_classes)
 
     def forward(self, x):
         # Input embedding
         x = self.patch_embed(x)
         cls_token = repeat(self.cls_token, "b s e -> (b repeat) s e",
                            repeat=x.size(0))
-        x = torch.cat([cls_token, x], dim=1)
+        dist_token = repeat(self.dist_token, "b s e -> (b repeat) s e",
+                            repeat=x.size(0))
+        x = torch.cat([cls_token, dist_token, x], dim=1)
 
         # Add positional embedding
         x = self.pos_drop(x + self.pos_embed)
 
         # Go through transformer encoder
         # Before: Shape of x: (batch_size, seq_len, embed_dim)
-        # After: Shape of x: (batch_size, embed_dim)
-        x = self.blocks(x)[:, 0]
+        x = self.blocks(x)
 
-        # Predict the final result using the first tokens
         # Shape of x: (batch_size, num_classes)
-        x = self.head(x)
+        # Shape of x_dist: (batch_size, num_classes)
+        x, x_dist = self.head(x[:, 0]), self.head(x[:, 1])
 
-        return x
+        if self.training:
+            return x, x_dist
+        else:
+            return (x + x_dist) / 2
 
 
 if __name__ == "__main__":
     test_tensor = torch.rand(1, 3, 224, 224)
-    model = ViT()
+    model = DeiT()
     print(model(test_tensor).shape)

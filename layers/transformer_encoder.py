@@ -1,7 +1,7 @@
 from typing import Optional
 import torch.nn as nn
-from feed_forward import FeedForward
-from attention import Attention
+from layers.feed_forward import FeedForward
+from layers.attention import Attention
 
 
 class TransformerEncoder(nn.Module):
