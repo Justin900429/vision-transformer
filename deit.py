@@ -85,4 +85,8 @@ class DeiT(nn.Module):
 if __name__ == "__main__":
     test_tensor = torch.rand(1, 3, 224, 224)
     model = DeiT()
+    output = model(test_tensor)
+    print(output[0].shape, output[1].shape)
+
+    model.eval()
     print(model(test_tensor).shape)
