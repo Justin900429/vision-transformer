@@ -1,3 +1,7 @@
+"""Adapted from
+https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/layers/mlp.py
+"""
+
 from typing import Optional
 import torch.nn as nn
 

@@ -1,3 +1,7 @@
+"""Adapted from
+https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/layers/patch_embed.py
+"""
+
 import torch.nn as nn
 
 

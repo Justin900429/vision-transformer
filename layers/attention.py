@@ -1,3 +1,7 @@
+"""Adapted from
+https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
+"""
+
 import torch
 import torch.nn as nn
 import einops

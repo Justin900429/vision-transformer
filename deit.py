@@ -1,3 +1,7 @@
+"""Adapted from
+https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
+"""
+
 from typing import Optional
 from functools import partial
 import torch
