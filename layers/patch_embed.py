@@ -1,7 +1,7 @@
 """Adapted from
 https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/layers/patch_embed.py
 """
-
+import torch
 import torch.nn as nn
 
 
@@ -33,3 +33,9 @@ class PatchEmbed(nn.Module):
         x = x.flatten(start_dim=2).transpose(1, 2)
         x = self.norm(x)
         return x
+
+
+if __name__ == "__main__":
+    test_tensor = torch.rand(1, 3, 224, 224)
+    embed = PatchEmbed()
+    print(embed(test_tensor).shape)

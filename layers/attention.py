@@ -31,15 +31,15 @@ class Attention(nn.Module):
     def forward(self, x: torch.tensor) \
             -> torch.tensor:
         # Make the dim head
-        # Shape of q: (batch_size, num_heads, q_seq_length, dim_head)
-        # Shape of k: (batch_size, num_heads, k_seq_length, dim_head)
-        # Shape of v: (batch_size, num_heads, v_seq_length, dim_head)
+        # Shape of q: (batch_size, num_heads, q_seq_length, head_dim)
+        # Shape of k: (batch_size, num_heads, k_seq_length, head_dim)
+        # Shape of v: (batch_size, num_heads, v_seq_length, head_dim)
         # NOTE: k_seq_length == v_seq_length
         q = einops.rearrange(self.q_w(x), "b s (n d) -> b n s d",
                              n=self.num_heads)
         k = einops.rearrange(self.k_w(x), "b s (n d) -> b n s d",
                              n=self.num_heads)
-        v = einops.rearrange(self.k_w(x), "b s (n d) -> b n s d",
+        v = einops.rearrange(self.v_w(x), "b s (n d) -> b n s d",
                              n=self.num_heads)
 
         # Compute the attention energy
