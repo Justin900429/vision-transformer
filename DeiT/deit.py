@@ -78,7 +78,7 @@ class DeiT(nn.Module):
 
         # Shape of x: (batch_size, num_classes)
         # Shape of x_dist: (batch_size, num_classes)
-        x, x_dist = self.head(x[:, 0]), self.head(x[:, 1])
+        x, x_dist = self.head(x[:, 0]), self.head_list(x[:, 1])
 
         if self.training:
             return x, x_dist
