@@ -7,7 +7,7 @@ from functools import partial
 import torch
 import torch.nn as nn
 from einops import repeat
-from layers.patch_embed import PatchEmbed
+from layers.embedding import PatchEmbed
 from layers.transformer_encoder import TransformerEncoder
 
 

@@ -1,6 +1,7 @@
 """Adapted from
 https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/layers/patch_embed.py
 """
+import math
 import torch
 import torch.nn as nn
 
@@ -35,7 +36,29 @@ class PatchEmbed(nn.Module):
         return x
 
 
+class SinusoidalEmbedding(nn.Module):
+    def __init__(self, embed_dim: int,
+                 seq_len: int = 5000):
+        super().__init__()
+
+        position = torch.arange(seq_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, embed_dim, 2) * (-math.log(10000.0) / embed_dim))
+        pe = torch.zeros(1, seq_len, embed_dim)
+
+        pe[0, :, 0::2] = torch.sin(position * div_term)
+        pe[0, :, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pe", pe)
+
+    def forward(self, x):
+        x = x + self.pe
+        return x
+
+
 if __name__ == "__main__":
     test_tensor = torch.rand(1, 3, 224, 224)
     embed = PatchEmbed()
     print(embed(test_tensor).shape)
+
+    test_sinusoidal_embed = torch.rand(1, 256, 768)
+    sin_embed = SinusoidalEmbedding(768, seq_len=256)
+    print(sin_embed(test_sinusoidal_embed).shape)

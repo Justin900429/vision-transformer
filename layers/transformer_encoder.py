@@ -4,8 +4,9 @@ https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision
 
 from typing import Optional
 import torch.nn as nn
-from layers.feed_forward import FeedForward
-from layers.attention import Attention
+from .feed_forward import FeedForward
+from .attention import Attention
+from utils import StochasticDepth
 
 
 class TransformerEncoder(nn.Module):
@@ -15,29 +16,31 @@ class TransformerEncoder(nn.Module):
                  drop: float = 0.0,
                  attn_drop: float = 0.0,
                  act_layer: Optional = nn.GELU,
-                 norm_layer: nn.Module = nn.LayerNorm):
+                 norm_layer: nn.Module = nn.LayerNorm,
+                 stochastic_drop_prob=0.0):
         super(TransformerEncoder, self).__init__()
 
         self.attn = nn.Sequential(
+            norm_layer(dim),
             Attention(dim=dim,
                       num_heads=num_heads,
                       qkv_bias=qkv_bias,
                       attn_drop=attn_drop,
                       proj_drop=drop),
-            norm_layer(dim),
         )
 
         self.feed_forward = nn.Sequential(
+            norm_layer(dim),
             FeedForward(in_features=dim,
                         factor=factor,
                         act_layer=act_layer,
                         drop=drop),
-            norm_layer(dim)
         )
+        self.drop_path = StochasticDepth(stochastic_drop_prob)
 
     def forward(self, x):
         # Shape of x: (batch_size, seq_len, embed_size)
-        x = x + self.attn(x)
-        x = x + self.feed_forward(x)
+        x = x + self.drop_path(self.attn(x))
+        x = x + self.drop_path(self.feed_forward(x))
 
         return x
