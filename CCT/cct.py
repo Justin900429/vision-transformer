@@ -137,8 +137,7 @@ class CCT(nn.Module):
                  pooling_kernel_size=3,
                  pooling_stride=2,
                  pooling_padding=1,
-                 seq_pool=True,
-                 embed_type="sine"):
+                 **args):
         super(CCT, self).__init__()
 
         self.conv_tokenizer = ConvolutionTokenizer(
@@ -161,11 +160,10 @@ class CCT(nn.Module):
                                                         width=img_size),
             num_layers=num_trans_layers,
             embed_dim=embed_dim,
-            seq_pool=seq_pool,
             drop_rate=0.,
             attn_drop=0.1,
             stochastic_depth_rate=0.1,
-            embed_type=embed_type
+            **args
         )
 
     def forward(self, x):
