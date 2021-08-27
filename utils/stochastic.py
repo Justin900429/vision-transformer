@@ -1,5 +1,5 @@
 """Adapted from
-https://github.com/SHI-Labs/Compact-Transformers/blob/main/src/utils/stochastic_depth.py
+https://github.com/rwightman/pytorch-image-models/blob/acd6c687fd1c0507128f0ce091829b233c8560b9/timm/models/layers/drop.py#L140-L168
 """
 import torch
 import torch.nn as nn

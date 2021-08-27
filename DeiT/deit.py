@@ -6,7 +6,7 @@ from typing import Optional
 from functools import partial
 import torch
 import torch.nn as nn
-from einops import repeat
+import einops
 from layers.embedding import PatchEmbed
 from layers.transformer_encoder import TransformerEncoder
 
@@ -63,10 +63,10 @@ class DeiT(nn.Module):
     def forward(self, x):
         # Input embedding
         x = self.patch_embed(x)
-        cls_token = repeat(self.cls_token, "b s e -> (b repeat) s e",
-                           repeat=x.size(0))
-        dist_token = repeat(self.dist_token, "b s e -> (b repeat) s e",
-                            repeat=x.size(0))
+        cls_token = einops.repeat(self.cls_token, "b s e -> (b repeat) s e",
+                                  repeat=x.size(0))
+        dist_token = einops.repeat(self.dist_token, "b s e -> (b repeat) s e",
+                                   repeat=x.size(0))
         x = torch.cat([cls_token, dist_token, x], dim=1)
 
         # Add positional embedding
