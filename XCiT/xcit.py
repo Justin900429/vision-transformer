@@ -93,8 +93,10 @@ class XCiT(nn.Module):
 
 
 if __name__ == "__main__":
+    """
     import os
     os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
+    """
     
     test_tensor = torch.randn(1, 3, 224, 224)
     model = XCiT(depth=1, cls_attn_layers=1, num_classes=10, eta=1e-5)

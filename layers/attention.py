@@ -9,14 +9,15 @@ import einops
 
 class Attention(nn.Module):
     def __init__(self, dim: int, num_heads: int, qkv_bias: bool,
-                 attn_drop: float, proj_drop: float):
+                 qk_scale: float = None, attn_drop: float = 0.,
+                 proj_drop: float = 0.):
         super(Attention, self).__init__()
 
         self.num_heads = num_heads
 
         assert (dim % num_heads == 0), "Argument `dim` should be factor of argument `num_heads"
         head_dim = dim // num_heads
-        self.scale = head_dim ** (-0.5)
+        self.scale = qk_scale or head_dim ** (-0.5)
 
         self.q_w = nn.Linear(dim, dim, bias=qkv_bias)
         self.k_w = nn.Linear(dim, dim, bias=qkv_bias)

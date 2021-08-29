@@ -34,8 +34,7 @@ class ClassAttention(nn.Module):
         # Shape of qkv: (3, batch_size, num_heads, seq_len, head_dim)
         # Shape of q, k, v: (batch_size, num_heads, seq_len, head_dim)
         qkv = einops.rearrange(qkv, "b s (n h e) -> n b h s e",
-                               n=3,
-                               h=self.num_heads)
+                               n=3, h=self.num_heads)
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         # Get only class token and remain the dimension
