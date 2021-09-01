@@ -1,6 +1,7 @@
 """Adapted from
 https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/layers/patch_embed.py
 """
+from typing import Optional
 import math
 import torch
 import torch.nn as nn
@@ -10,20 +11,28 @@ class PatchEmbed(nn.Module):
     def __init__(self,
                  img_size: int = 224,
                  patch_size: int = 16,
+                 stride: int = None,
                  in_channels: int = 3,
                  embed_dim: int = 768,
-                 norm_layer: nn.Module = nn.LayerNorm):
+                 norm_layer: Optional = nn.LayerNorm):
         super(PatchEmbed, self).__init__()
 
         assert (img_size % patch_size == 0), "Argument `img_size` should be factor of argument `patch_size`"
         self.grid_size = (img_size // patch_size)
         self.num_patches = self.grid_size ** 2
 
+        if stride is None:
+            stride = patch_size
+
         self.proj = nn.Conv2d(in_channels=in_channels,
                               out_channels=embed_dim,
                               kernel_size=patch_size,
-                              stride=patch_size)
-        self.norm = norm_layer(embed_dim)
+                              stride=stride)
+
+        if norm_layer is not None:
+            self.norm = norm_layer(embed_dim)
+        else:
+            self.norm = norm_layer
 
     def forward(self, x):
         # Before: Shape of x: (batch_size, channels, width, height)
@@ -32,7 +41,9 @@ class PatchEmbed(nn.Module):
 
         # Shape of x: (batch_size, (img_size // patch_size) ** 2, embed_dim)
         x = x.flatten(start_dim=2).transpose(1, 2)
-        x = self.norm(x)
+
+        if self.norm is not None:
+            x = self.norm(x)
         return x
 
 

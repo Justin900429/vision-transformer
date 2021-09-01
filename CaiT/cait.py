@@ -96,9 +96,6 @@ class CaiT(nn.Module):
 
 
 if __name__ == "__main__":
-    import os
-    os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
-
     test_tensor = torch.rand(1, 3, 224, 224)
     model = CaiT(num_classes=10, depth=1, depth_token_only=1)
     print(model(test_tensor).shape)

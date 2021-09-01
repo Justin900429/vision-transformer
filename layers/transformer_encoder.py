@@ -15,9 +15,9 @@ class TransformerEncoder(nn.Module):
                  qkv_bias: bool = False,
                  drop: float = 0.0,
                  attn_drop: float = 0.0,
-                 act_layer: Optional = nn.GELU,
+                 act_layer: nn.Module = nn.GELU,
                  norm_layer: nn.Module = nn.LayerNorm,
-                 stochastic_drop_prob=0.0):
+                 stochastic_drop_prob: float = 0.0):
         super(TransformerEncoder, self).__init__()
 
         self.attn = nn.Sequential(
