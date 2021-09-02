@@ -153,9 +153,6 @@ class PoolingTransformer(nn.Module):
 
 
 if __name__ == "__main__":
-    import os
-    os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
-
     test_tensor = torch.rand(1, 3, 224, 224)
     model = PoolingTransformer(num_classes=10)
     print(model(test_tensor).shape)

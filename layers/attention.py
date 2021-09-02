@@ -8,24 +8,28 @@ import einops
 
 
 class Attention(nn.Module):
-    def __init__(self, dim: int, num_heads: int, qkv_bias: bool,
-                 qk_scale: float = None, attn_drop: float = 0.,
-                 proj_drop: float = 0.):
+    def __init__(self, dim: int, num_heads: int, in_dim: int = None,
+                 qkv_bias: bool = True, qk_scale: float = None,
+                 attn_drop: float = 0., proj_drop: float = 0.,
+                 residual_before: bool = False):
         super(Attention, self).__init__()
 
+        self.residual_before = residual_before
         self.num_heads = num_heads
 
         assert (dim % num_heads == 0), "Argument `dim` should be factor of argument `num_heads"
-        head_dim = dim // num_heads
+        if in_dim is None:
+            in_dim = dim
+        head_dim = in_dim // num_heads
         self.scale = qk_scale or head_dim ** (-0.5)
 
-        self.q_w = nn.Linear(dim, dim, bias=qkv_bias)
-        self.k_w = nn.Linear(dim, dim, bias=qkv_bias)
-        self.v_w = nn.Linear(dim, dim, bias=qkv_bias)
+        self.q_w = nn.Linear(dim, in_dim, bias=qkv_bias)
+        self.k_w = nn.Linear(dim, in_dim, bias=qkv_bias)
+        self.v_w = nn.Linear(dim, in_dim, bias=qkv_bias)
 
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj = nn.Sequential(
-            nn.Linear(dim, dim),
+            nn.Linear(in_dim, in_dim),
             nn.Dropout(proj_drop)
         )
 
@@ -50,9 +54,13 @@ class Attention(nn.Module):
         attn = self.attn_drop(attn)
 
         # Compute the final weight on value
-        # Shape of x: (batch_size, q_seq_length, emb_size)
+        # Shape of x: (batch_size, q_seq_length, in_dim)
         x = torch.einsum("bnqk,bnkd->bnqd", attn, v)
         x = einops.rearrange(x, "b n q d -> b q (n d)")
         x = self.proj(x)
+
+        if self.residual_before:
+            v = einops.rearrange(v, "b n v d -> b v (n d)")
+            x = x + v
 
         return x
