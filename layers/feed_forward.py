@@ -14,10 +14,10 @@ class FeedForward(nn.Module):
         super(FeedForward, self).__init__()
         self.fc = nn.Sequential(
             nn.Linear(in_features=in_features,
-                      out_features=in_features * factor),
+                      out_features=int(in_features * factor)),
             nn.Dropout(drop),
             act_layer(),
-            nn.Linear(in_features=in_features * factor,
+            nn.Linear(in_features=int(in_features * factor),
                       out_features=in_features),
             nn.Dropout(drop)
         )
