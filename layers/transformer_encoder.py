@@ -19,7 +19,8 @@ class TransformerEncoder(nn.Module):
                  act_layer: nn.Module = nn.GELU,
                  norm_layer: nn.Module = nn.LayerNorm,
                  stochastic_drop_prob: float = 0.0,
-                 residual_before: bool = False):
+                 residual_before: bool = False,
+                 attention: nn.Module = Attention):
         super(TransformerEncoder, self).__init__()
         self.residual_before = residual_before
         if in_dim is None:
@@ -27,7 +28,7 @@ class TransformerEncoder(nn.Module):
 
         self.attn = nn.Sequential(
             norm_layer(dim),
-            Attention(dim=dim,
+            attention(dim=dim,
                       num_heads=num_heads,
                       in_dim=in_dim,
                       qkv_bias=qkv_bias,

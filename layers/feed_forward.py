@@ -2,13 +2,13 @@
 https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/layers/mlp.py
 """
 
-from typing import Optional
+from typing import Optional, Union
 import torch.nn as nn
 
 
 class FeedForward(nn.Module):
     def __init__(self, in_features: int,
-                 factor: int = None,
+                 factor: Union[int, float] = None,
                  act_layer: Optional = nn.GELU,
                  drop: float = 0.0):
         super(FeedForward, self).__init__()
