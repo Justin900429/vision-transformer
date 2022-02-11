@@ -18,7 +18,7 @@ class StochasticDepth(nn.Module):
         # Directly return the value if
         # 1. Probability is 0.0
         # 2. Validation
-        if self.drop_prob == 0.0 or self.training:
+        if self.drop_prob == 0.0 or not self.training:
             return x
 
         keep_prob = 1 - self.drop_prob
